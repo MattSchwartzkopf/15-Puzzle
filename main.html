@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="puzzle.css"> 
+    </head>
+    <body>
+        <table id="myTable">
+    </table>
+    <br>
+
+    <script>
+        function createTable() {
+            var array = [];
+            var runOnce = true;
+            var table = document.getElementById("myTable");
+            var tableSize = Number(document.getElementById("tableSize").value);
+            var row = table.insertRow(0);
+
+            for(var i = tableSize; i > 0; i--) {
+                row[i] = table.insertRow(0);
+    
+                for(var j = tableSize; j > 0; j--) {
+                    if (runOnce) {
+                        var cell = row[i].insertCell(0);
+                        cell.innerHTML = "__";
+                        array.push(cell);
+                        runOnce = false;
+                        cell.addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize)});
+                    }
+                    else {
+                        cell[j] = row[i].insertCell(0);
+                        cell[j].innerHTML = randomNum();
+                        cell[j].addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize)});
+                        array.push(cell[j]);
+                    }
+                }
+            }
+        }
+
+        function findCell(cell, array, tableSize) {
+            var holder;
+
+            for(var i = 0; i < array.length; i++) {
+                if(array[i].innerHTML == cell) {
+                    console.log("Found " + cell);
+                    if (array[i - tableSize].innerHTML == "__") { // Swaps values
+                        holder = cell;
+                        cell = array[i - tableSize].innerHTML;
+                        array[i - tableSize].innerHTML = cell;
+                    }
+                }
+                else
+                    continue;
+            }
+        }
+
+
+        function randomNum() {
+            return Math.floor(Math.random() * 10);
+        }
+
+    </script>
+
+    <h3>Table Size: </h3>
+    <input type="number" id="tableSize">
+    <button onclick="createTable()">Create Table</button>
+    </body>
+</html>
