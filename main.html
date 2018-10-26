@@ -16,6 +16,11 @@
             var tableSize = Number(document.getElementById("tableSize").value);
             var row = table.insertRow(0);
 
+            document.addEventListener('DOMContentLoaded', function () {
+                table.addEventListener("change", alert(table.value) );
+
+            } );
+
             for(var i = tableSize; i > 0; i--) {
                 row[i] = table.insertRow(0);
     
@@ -25,39 +30,41 @@
                         cell.innerHTML = "__";
                         array.push(cell);
                         runOnce = false;
-                        cell.addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize)});
+                        cell.addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize, table)});
                     }
                     else {
                         cell[j] = row[i].insertCell(0);
                         cell[j].innerHTML = randomNum();
-                        cell[j].addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize)});
+                        cell[j].addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize, table)});
                         array.push(cell[j]);
                     }
                 }
             }
         }
 
-        function findCell(cell, array, tableSize) {
+        function findCell(cell, array, tableSize, table) {
             var holder;
 
             for(var i = 0; i < array.length; i++) {
-                if(array[i].innerHTML == cell) {
-                    console.log("Found " + cell);
-                    if (array[i - tableSize].innerHTML == "__") { // Swaps values
-                        holder = cell;
-                        cell = array[i - tableSize].innerHTML;
-                        array[i - tableSize].innerHTML = cell;
-                    }
+                if (array[tableSize - i].innerHTML == "__" && array[i].innerHTML == cell) { // Swaps values
+                    moveDown(i, cell, array, tableSize, table);
                 }
                 else
                     continue;
-            }
+            }   
         }
 
+        function moveDown(i, cell, array, tableSize, table) {
+            holder = cell;
+            array[i].innerHTML = "__";
+            array[tableSize - i].innerHTML = holder;
+        }
 
         function randomNum() {
             return Math.floor(Math.random() * 10);
         }
+
+
 
     </script>
 
