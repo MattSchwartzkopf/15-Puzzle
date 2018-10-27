@@ -1,7 +1,16 @@
+body {
+    background-color:lightblue;
+    text-align: center;
+}
+
 td, tr {
     width: 50px;
+    background-color: lightcoral;
+    text-align: center;
 }
 
 table, td {
-    border: 1px solid black;
+    border: 2px solid black;
+    color:white;
+    text-align: center;
 }
