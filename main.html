@@ -17,9 +17,13 @@
             var runOnce = true;
             var tableSize = Number(document.getElementById("tableSize").value);
             var size = tableSize * tableSize -1;
+            var counterArr = [];
             var table = document.getElementById("myTable");
             var row = table.insertRow(0);
-            
+
+            // Builds the number array for the cells
+            generateNumbers(size, counterArr);
+
             // Outer for-loop that adds rows
             for(var i = tableSize; i > 0; i--) {
                 row[i] = table.insertRow(0);
@@ -33,11 +37,11 @@
                         array.push(cell);
 
                         // This reads user input - finds what cell the player clicked on
-                        cell.addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize, table)});
+                        cell.addEventListener("click", (event) => { findCell(event.target, array, tableSize, table)});
                     }
                     else {
                         cell[j] = row[i].insertCell(0);
-                        cell[j].innerHTML = randomNum(size);
+                        cell[j].innerHTML = randomNum(counterArr);
 
                         // This reads user input - finds what cell the player clicked on
                         cell[j].addEventListener("click", (event) => { findCell(event.target, array, tableSize)});
@@ -71,18 +75,44 @@
             }   
         }
 
+        // Loads an array with the size of the table
+        function generateNumbers(size, counterArr) {
+            for (var i = 1; i <= size; i++) {
+                counterArr.push(i);
+            }
+            // Calls the shuffle function to shuffle elements in the array
+            shuffle(counterArr);
+        }
+
+        // Shuffles all numbers in cells
+        function shuffle(counterArr) {
+            var holder = 0;
+            var counter = counterArr.length;
+
+            for (var i = 1; i <= counterArr.length; i++) {
+                var randNum = Math.floor(Math.random() * counter);
+                counter--;
+
+                // Swaps incremental value with randomly selected value in the array
+                holder = counterArr[counter];
+                counterArr[counter] = counterArr[randNum];
+                counterArr[randNum] = holder;
+            }
+        }
+        
+        // Gets a random number in the range of the table size
+        // and deletes the number that was just used
+        function randomNum(counterArr) {
+            return (counterArr.pop());
+        }
+
         // Swaps values of the user's selected cell value and the blank space
         function swapValues(cell, array, location) {
             var holder = "";
-            holder  = cell.innerHTML;
+            holder = cell.innerHTML;
             cell.innerHTML = array[location].innerHTML;
             array[location].innerHTML = holder;
             return event;
-        }
-
-        // Gets a random number in the range of the table size
-        function randomNum(size) {
-            return Math.floor(Math.random() * size);
         }
 
     </script>
