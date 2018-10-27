@@ -4,62 +4,85 @@
         <link rel="stylesheet" href="puzzle.css"> 
     </head>
     <body>
-        <table id="myTable">
-    </table>
+        <table id="myTable" align="center">
+        </table>
     <br>
 
     <script>
+        // Creates the table to size by user input
+        // Builds rows bottom to top, cells right to left
         function createTable() {
+            var cell;
             var array = [];
             var runOnce = true;
-            var table = document.getElementById("myTable");
             var tableSize = Number(document.getElementById("tableSize").value);
+            var size = tableSize * tableSize -1;
+            var table = document.getElementById("myTable");
             var row = table.insertRow(0);
-
+            
+            // Outer for-loop that adds rows
             for(var i = tableSize; i > 0; i--) {
                 row[i] = table.insertRow(0);
-    
+                
+                // Inner for-loop to add a cell
                 for(var j = tableSize; j > 0; j--) {
                     if (runOnce) {
-                        var cell = row[i].insertCell(0);
+                        runOnce = false;
+                        cell = row[i].insertCell(0);
                         cell.innerHTML = "__";
                         array.push(cell);
-                        runOnce = false;
+
+                        // This reads user input - finds what cell the player clicked on
                         cell.addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize, table)});
                     }
                     else {
                         cell[j] = row[i].insertCell(0);
-                        cell[j].innerHTML = randomNum();
-                        cell[j].addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize, table)});
+                        cell[j].innerHTML = randomNum(size);
+
+                        // This reads user input - finds what cell the player clicked on
+                        cell[j].addEventListener("click", (event) => { findCell(event.target, array, tableSize)});
                         array.push(cell[j]);
                     }
                 }
             }
         }
 
-        function findCell(cell, array, tableSize, table) {
-            var holder;
+        // Traverses table and finds location of cell the user clicked on
+        // Swaps values of user's selected cell and the blank space
+        function findCell(cell, array, tableSize) {
+            var location;
+            var runOnce = true;
+            var size = tableSize * tableSize -1;
 
+            // Loops through an array holding the values of all cell values
             for(var i = 0; i < array.length; i++) {
-                if (array[tableSize - i].innerHTML == "__") { // Compares values
-                    moveDown(i, cell, array, tableSize, table);
-                }
-                else
+                // If values were already swapped once, return to previous function call
+                if (!runOnce)
+                    return;
+                // If blank space isn't found in the table, continue seraching
+                if (array[size - i].innerHTML != "__")
                     continue;
+                // If blank space is found, swap values of cell and blank space
+                if (array[size - i].innerHTML == "__") { // Compares values
+                    runOnce = false;
+                    location = (size - i);
+                    swapValues(cell, array, location);
+                }
             }   
         }
 
-        function moveDown(i, cell, array, tableSize, table) {
-            holder = cell;
-            array[i].innerHTML = "__";
-            array.push();
-            array[tableSize - i].innerHTML = holder;
-            cell.addEventListener("click", (event) => { findCell(event.target.innerHTML, array, tableSize, table)});
-            return;
+        // Swaps values of the user's selected cell value and the blank space
+        function swapValues(cell, array, location) {
+            var holder = "";
+            holder  = cell.innerHTML;
+            cell.innerHTML = array[location].innerHTML;
+            array[location].innerHTML = holder;
+            return event;
         }
 
-        function randomNum() {
-            return Math.floor(Math.random() * 10);
+        // Gets a random number in the range of the table size
+        function randomNum(size) {
+            return Math.floor(Math.random() * size);
         }
 
     </script>
