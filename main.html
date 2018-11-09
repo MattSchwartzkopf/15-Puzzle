@@ -9,11 +9,20 @@
     <br>
 
     <script>
+        // Global variables
+        var array = [];
+
+        // Constructor for program
+        function init() {
+            reset();
+            addCSS();
+            createTable();
+            document.getElementById("tableSize").value = '';
+        }
         // Creates the table to size by user input
         // Builds rows bottom to top, cells right to left
         function createTable() {
             var cell;
-            var array = [];
             var runOnce = true;
             var tableSize = Number(document.getElementById("tableSize").value);
             var size = tableSize * tableSize -1;
@@ -37,14 +46,14 @@
                         array.push(cell);
 
                         // This reads user input - finds what cell the player clicked on
-                        cell.addEventListener("click", (event) => { findCell(event.target, array, tableSize, table)});
+                        cell.addEventListener("click", (event) => { findCell(event.target, tableSize)});
                     }
                     else {
                         cell[j] = row[i].insertCell(0);
                         cell[j].innerHTML = randomNum(counterArr);
 
                         // This reads user input - finds what cell the player clicked on
-                        cell[j].addEventListener("click", (event) => { findCell(event.target, array, tableSize)});
+                        cell[j].addEventListener("click", (event) => { findCell(event.target, tableSize)});
                         array.push(cell[j]);
                     }
                 }
@@ -53,33 +62,29 @@
 
         // Traverses table and finds location of cell the user clicked on
         // Swaps values of user's selected cell and the blank space
-        function findCell(cell, array, tableSize) {
-            var location;
-            var runOnce = true;
-            var size = tableSize * tableSize -1;
-
-            // Loops through an array holding the values of all cell values
-            for(var i = 0; i < array.length; i++) {
-                // If values were already swapped once, return to previous function call
-                if (!runOnce)
-                    return;
-                // If blank space isn't found in the table, continue seraching
-                if (array[size - i].innerHTML != "__")
-                    continue;
-                // If blank space is found, swap values of cell and blank space
-                if (array[size - i].innerHTML == "__") { // Compares values
-                    runOnce = false;
-                    location = (size - i);
-                    swapValues(cell, array, location);
+        function findCell(cell, tableSize) {
+            var blankSpaceLocation;
+            var numLocation;
+            
+            // Finds the location of user's selected cell and the blank space
+            for (var i = 0; i < array.length; i++) {
+                if (array[i].innerHTML == cell.innerHTML){
+                    numLocation = i;
+                    for (var j = 0; j < array.length; j++) {
+                        if (array[j].innerHTML == "__") {
+                            blankSpaceLocation = j;
+                            swapValues(cell, blankSpaceLocation, numLocation, tableSize);
+                            return;
+                        }
+                    }
                 }
-            }   
+            }
         }
 
         // Loads an array with the size of the table
         function generateNumbers(size, counterArr) {
-            for (var i = 1; i <= size; i++) {
+            for (var i = 1; i <= size; i++)
                 counterArr.push(i);
-            }
             // Calls the shuffle function to shuffle elements in the array
             shuffle(counterArr);
         }
@@ -88,7 +93,8 @@
         function shuffle(counterArr) {
             var holder = 0;
             var counter = counterArr.length;
-
+            
+            // Chooses a random number as an index to swap cell values
             for (var i = 1; i <= counterArr.length; i++) {
                 var randNum = Math.floor(Math.random() * counter);
                 counter--;
@@ -107,20 +113,88 @@
         }
 
         // Swaps values of the user's selected cell value and the blank space
-        function swapValues(cell, array, location) {
+        function swapValues(cell, blankSpaceLocation, numLocation, tableSize) {
             var holder = "";
-            holder = cell.innerHTML;
-            cell.innerHTML = array[location].innerHTML;
-            array[location].innerHTML = holder;
-            return event;
+            var neg = tableSize - (tableSize * 2);
+            var boundaries = [tableSize, neg, 1, -1];
+            var elseBoundaries = [(blankSpaceLocation - 1), (blankSpaceLocation + tableSize), (blankSpaceLocation - tableSize)];
+            
+            // IIf the blank space and the cell to swap are not on different rows and opposite sides, swap
+            if(boundaries.includes(blankSpaceLocation - numLocation) && numLocation % tableSize != 0 || numLocation % tableSize == 0 && elseBoundaries.includes(numLocation)) {
+                holder = cell.innerHTML;
+                cell.innerHTML = array[blankSpaceLocation].innerHTML;
+                array[blankSpaceLocation].innerHTML = holder;
+            }
+        }
+
+        // Resets the table to null
+        function reset() {
+            // Deletes text in table cells
+            document.getElementById("myTable").innerHTML = ""; 
+            // Sets the array to null
+            array = []; 
+        }
+
+        // CSS elements to be added once table is created
+        function addCSS() {
+            document.getElementById("myTable").style.border = "thin solid #000000";
+            document.getElementById("myTable").style.borderTp = "thin solid #000000";
+            document.getElementById("myTable").style.width = "800px";
+            document.getElementById("myTable").style.height = "800px";
+        }
+
+        // Checks if the array (puzzle) is in order, otherwise swaps values
+        function solvePuzzle() {
+            // Bubblesort to solve game
+            var temp;
+            var check;
+
+            while(!check) {
+            for (var i = 0; i < array.length; i++) {
+                if(!(array[i+1])) {
+                    check = checkSolver();
+                    if(check)
+                        return;
+                    else
+                       i = 0;
+                }
+                if (Number(array[i].innerHTML) >= Number(array[i+1].innerHTML) || array[i].innerHTML == "__" || array[i+1].innerHTML == "__")
+                    continue;
+                else {
+                    temp = array[i].innerHTML;
+                    array[i].innerHTML = array[i+1].innerHTML;
+                    array[i+1].innerHTML = temp;
+                }
+            }
+        }
+    }
+
+        // Reads all the elements in the array and check if they're in order
+        // Returns true if they are in order and false if they aren't
+        function checkSolver() {
+            for (var i = 1; i <= array.length; i++) {
+                if (Number(array[i].innerHTML) >= Number(array[i+1].innerHTML))
+                    if(i == array.length-2)
+                        return true;
+                    else
+                        continue;
+                else
+                    return false;
+            }
         }
 
     </script>
 
     <h3>
         Table Size: 
-        <input type="number" id="tableSize"> 
-        <button onclick="createTable()" style=>Create Table</button>
+        <input id="tableSize" type="number"> 
+        <button id="tableSize" onclick="init()" style=>Create Table</button><br>
+
+        Reset:
+        <button onclick="reset()">Reset Table</button><br>
+
+        Solve Puzzle:
+        <button onclick="solvePuzzle()">Solve</button>
     </h3>
     
     </body>
